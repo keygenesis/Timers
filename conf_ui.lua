@@ -22,6 +22,21 @@ require('common')
 local helpers = require('helpers')
 local imgui = require('imgui')
 
+local function BeginChildCompat(id, size, border, flags)
+    local child_flags = 0
+    local window_flags = flags or ImGuiWindowFlags_None or 0
+
+    if border == true then
+        child_flags = ImGuiChildFlags_Borders or 1
+    elseif border == false or border == nil then
+        child_flags = ImGuiChildFlags_None or 0
+    else
+        child_flags = border
+    end
+
+    return imgui.BeginChild(id, size, child_flags, window_flags)
+end
+
 local gHeaderColor = { 1.0, 0.75, 0.55, 1.0 }
 
 local ui = T{
@@ -31,7 +46,7 @@ local ui = T{
 ui.render_panel_tab = function(settings)
     -- Panel Settings
     imgui.TextColored(gHeaderColor, 'Panel Settings')
-    imgui.BeginChild('panel_options', { 0, 233 }, true);
+    BeginChildCompat('panel_options', { 0, 233 }, true);
         if imgui.Checkbox('Enabled?', { settings.timers.settings.enabled }) then
             settings.timers.settings.enabled = not settings.timers.settings.enabled
         end
@@ -51,7 +66,7 @@ ui.render_panel_tab = function(settings)
 
         -- Background
         imgui.TextColored(gHeaderColor, 'Background')
-        imgui.BeginChild('background_options', { 0, 149 }, true);
+        BeginChildCompat('background_options', { 0, 149 }, true);
             if imgui.Checkbox('Visible?', { settings.timers.settings.enable_background }) then
                 settings.timers.settings.enable_background = not settings.timers.settings.enable_background
             end
@@ -91,7 +106,7 @@ end
 ui.render_timer_tab = function(settings)
     -- Timer Settings
     imgui.TextColored(gHeaderColor, 'Timer Settings')
-    imgui.BeginChild('timer_options', { 0, 441 }, true);
+    BeginChildCompat('timer_options', { 0, 441 }, true);
         if imgui.Checkbox('AoE Timers?', { settings.settings.party_buffs }) then
             settings.settings.party_buffs = not settings.settings.party_buffs
         end
@@ -131,7 +146,7 @@ ui.render_timer_tab = function(settings)
 
         -- Thresholds
         imgui.TextColored(gHeaderColor, 'Thresholds');
-        imgui.BeginChild('conf_timer_threshold', { 0, 87 }, true)
+        BeginChildCompat('conf_timer_threshold', { 0, 87 }, true)
             imgui.PushID('T#1');
             local t = T{ settings.timers.settings.thresholds.t75 }
             imgui.InputInt(' ', t);
@@ -161,7 +176,7 @@ ui.render_timer_tab = function(settings)
         imgui.EndChild();
 
         imgui.TextColored(gHeaderColor, 'Colors');
-        imgui.BeginChild('conf_timer_colors', { 0, 110 }, true)
+        BeginChildCompat('conf_timer_colors', { 0, 110 }, true)
             local c = helpers.color_u32_to_v4(settings.timers.settings.colors.color100);
             if (imgui.ColorEdit4(('\xef\x80\x97 > T1 (%ds)'):format(settings.timers.settings.thresholds.t75), c)) then
                 settings.timers.settings.colors.color100 = helpers.color_v4_to_u32(c);
@@ -192,7 +207,7 @@ end
 ui.render_font_tab = function(settings)
     -- Font Settings
     imgui.TextColored(gHeaderColor, 'Font Settings');
-    imgui.BeginChild('conf_font', { 0, 322 }, true);
+    BeginChildCompat('conf_font', { 0, 322 }, true);
         if imgui.Checkbox('Background Visible?', { settings.timers.settings.font_bg_visible }) then
             settings.timers.settings.font_bg_visible = not settings.timers.settings.font_bg_visible
         end
@@ -226,7 +241,7 @@ ui.render_font_tab = function(settings)
         imgui.ShowHelp('Timer font background color.', true);
 
         imgui.TextColored(gHeaderColor, 'Title Font');
-        imgui.BeginChild('conf_title_font', { 0, 60 }, true);
+        BeginChildCompat('conf_title_font', { 0, 60 }, true);
             local size = T{ settings.timers.settings.name_font_offset_x }
             imgui.SliderInt('\xef\x95\x87 X Offset', size, -250, 250, '%dpx');
             settings.timers.settings.name_font_offset_x = size[1]
@@ -239,7 +254,7 @@ ui.render_font_tab = function(settings)
         imgui.EndChild()
 
         imgui.TextColored(gHeaderColor, 'Timer Font');
-        imgui.BeginChild('conf_timer_font', { 0, 60 }, true);
+        BeginChildCompat('conf_timer_font', { 0, 60 }, true);
             local size = T{ settings.timers.settings.timer_font_offset_x }
             imgui.SliderInt('\xef\x95\x87 X Offset', size, -250, 250, '%dpx');
             settings.timers.settings.timer_font_offset_x = size[1]
@@ -256,7 +271,7 @@ end
 ui.render_icon_tab = function(settings)
     -- Icon Settings
     imgui.TextColored(gHeaderColor, 'Icon Settings');
-    imgui.BeginChild('conf_icon', { 0, 110 }, true);
+    BeginChildCompat('conf_icon', { 0, 110 }, true);
         if imgui.Checkbox('Enabled?', { settings.timers.settings.enable_icons }) then
             settings.timers.settings.enable_icons = not settings.timers.settings.enable_icons
         end
